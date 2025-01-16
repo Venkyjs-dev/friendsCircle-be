@@ -3,11 +3,11 @@ const profileRouter = express.Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const {
-  userAuth,
   validateProfileEdit,
   validateForgotPassword,
 } = require("../middleware/validation");
 const { validationResult } = require("express-validator");
+const { userAuth } = require("../middleware/userAuth");
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {

@@ -38,3 +38,6 @@
 2025-01-14T18:08:37.746Z - INFO - devayani@gmail.com logged in successfully
 2025-01-14T18:18:07.395Z - INFO - devayani@gmail.com logged in successfully
 2025-01-14T18:43:02.776Z - INFO - devayani@gmail.com logged in successfully
+2025-01-16T02:18:43.583Z - INFO - devayani@gmail.com logged in successfully
+2025-01-16T02:34:04.405Z - INFO - User signed up successfully: {"firstName": "Venkatesh", "lastName": "THI", "emailId": "venky@gmail.com"}
+2025-01-16T02:34:09.301Z - INFO - venky@gmail.com logged in successfully

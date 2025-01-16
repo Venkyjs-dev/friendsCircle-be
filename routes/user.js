@@ -1,7 +1,8 @@
 const express = require("express");
 const userRouter = express.Router();
-const { userAuth } = require("../middleware/validation");
+const { userAuth } = require("../middleware/userAuth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const USER_DATA = "firstName lastName age gender about skills photoUrl";
 
@@ -58,14 +59,69 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     });
   }
 });
-module.exports = userRouter;
 
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user._id;
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const feed = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select(USER_DATA);
+    res.status(200).json({
+      status: "OK",
+      data: feed,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "Not Ok",
+      message: "ERROR: " + err.message,
+    });
+  }
+});
+module.exports = userRouter;
 /*
-1. user shoudl be logged.
-2. find all connections:
-    - status === "accepted"
-    - loggedUserId === fromUserId || loggedUserId === toUserId
-3. get the other users data also using populate
-4. if empty send error response
-5. send resposne of all the valid connections 
+
+Feed API Logic
+
+1. need to send all the users present in my user collection in db
+2. don't show these profiles in feed : 
+    - own profile
+    - sent connections - interested/ignored
+    - received connections - accepted/rejected
+3. logic:
+    - get all the connection requests of the logged in user in the connection request collections.
+        - loggedInUserId == fromUserId || loggedInUserId == toUserId
+    - get the exact unique id's to which needs to be removed, in an array format.
+    - write query on User collection and ignore the above unique ids and get the other users
+    - show only proper data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 */
