@@ -3,6 +3,8 @@ const userRouter = express.Router();
 const { userAuth } = require("../middleware/validation");
 const ConnectionRequest = require("../models/connectionRequest");
 
+const USER_DATA = "firstName lastName age gender about skills photoUrl";
+
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -10,24 +12,8 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
       toUserId: loggedInUser._id,
       status: "interested",
     })
-      .populate("fromUserId", [
-        "firstName",
-        "lastName",
-        "age",
-        "gender",
-        "about",
-        "skills",
-        "photoUrl",
-      ])
-      .populate("toUserId", [
-        "firstName",
-        "lastName",
-        "age",
-        "gender",
-        "about",
-        "skills",
-        "photoUrl",
-      ]);
+      .populate("fromUserId", USER_DATA)
+      .populate("toUserId", USER_DATA);
     if (connectionRequests.length == 0)
       throw new Error("No pending requests for this user!");
     const data = connectionRequests.map((row) => {
@@ -55,14 +41,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     const connections = await ConnectionRequest.find({
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
       status: "accepted",
-    }).populate("fromUserId", [
-      "firstName",
-      "lastName",
-      "age",
-      "about",
-      "skills",
-      "photoUrl",
-    ]);
+    }).populate("fromUserId", USER_DATA);
     if (connections.length === 0)
       throw new Error("User don't have connections");
 
