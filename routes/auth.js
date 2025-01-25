@@ -115,7 +115,7 @@ authRouter.post("/login", validateLogin, async (req, res) => {
 
     res.status(200).json({
       status: "Ok",
-      message: "login successfull",
+      data: user,
     });
     logger.info(`${emailId} logged in successfully`);
   } catch (e) {
