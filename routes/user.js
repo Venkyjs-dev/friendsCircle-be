@@ -19,9 +19,11 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
       throw new Error("No pending requests for this user!");
     const data = connectionRequests.map((row) => {
       if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
-        return row.toUserId;
+        let connectionObj = { ...row.toUserId.toObject(), requestId: row._id };
+        return connectionObj;
       }
-      return row.fromUserId;
+      let connectionObj = { ...row.fromUserId.toObject(), requestId: row._id };
+      return connectionObj;
     });
     res.status(200).json({
       status: "Ok",
