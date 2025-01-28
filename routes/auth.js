@@ -53,18 +53,24 @@ authRouter.post(
       });
 
       // Save the user document to the database
-      await user.save();
+      const savedUser = await user.save();
 
       const successMessage = `User signed up successfully: {"firstName": "${firstName}", "lastName": "${lastName}", "emailId": "${emailId}"}`;
 
       // Log success message
       logger.info(successMessage);
-
-      // Send a success response upon user creation
-      res.status(201).json({
-        status: "success",
-        message: "User created successfully",
-      });
+      // create a token
+      const token = await user.getJWT();
+      // add token into cookie and send to client
+      res
+        .cookie("token", token, {
+          expires: new Date(Date.now() + 8 * 60 * 60 * 1000),
+        })
+        .status(201)
+        .json({
+          message: "User created successfully",
+          data: savedUser,
+        });
     } catch (e) {
       // Handle unexpected errors (e.g., database issues)
 
