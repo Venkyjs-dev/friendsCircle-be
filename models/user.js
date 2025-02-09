@@ -61,6 +61,7 @@ const UserSchema = new Schema(
     },
     photoUrl: {
       type: String,
+      default: "https://randomuser.me/api/portraits/men/1.jpg",
       validate(value) {
         if (!validator.isURL(value)) {
           throw new Error("invalid photo url!" + value);
